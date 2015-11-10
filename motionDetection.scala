@@ -35,17 +35,14 @@ def getImg: BufferedImage = {
 }
 
 
-def diff(img1: BufferedImage, img2: BufferedImage): Int = {
-	
-	val width = img1.getWidth
-	val height = img2.getHeight
-	val difs = for {
-		i <- 0 until width; 
-		j <- 0 until height;
-		if distance(new Color(img1.getRGB(i, j)), new Color(img2.getRGB(i, j))) > 100
-	} yield 1;	
-	difs.length	
-}
+def diff(img1: BufferedImage, img2: BufferedImage, sensitivity: Int)
+		(width: Int = img1.getWidth, height: Int = img2.getHeight, startX: Int = 0, startY: Int = 0): Seq[(Int, Int, Double)] = 
+	for {
+		i <- startX until width; 
+		j <- startY until height;
+		dist = distance(new Color(img1.getRGB(i, j)), new Color(img2.getRGB(i, j)))
+		if dist > sensitivity
+	} yield (i, j, dist);
 
 
 
@@ -79,7 +76,7 @@ new Thread {
 			MotionDetection.img.icon = Swing.Icon(newImg)
 			
 			MotionDetection.panel.repaint
-			println(diff(last, newImg))
+			println(diff(last, newImg, 100)().length)
 			//println(diff2(imgs._2, last._2))
 			last = newImg			
 		}
