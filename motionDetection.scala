@@ -9,6 +9,7 @@ import scala.math.{sqrt, pow}
 import scala.swing._
 import javax.swing.{Icon, ImageIcon}
 import java.awt.GridLayout
+import java.time._;
 
 
 Authenticator.setDefault( new Authenticator() {
@@ -73,10 +74,24 @@ new Thread {
 		while (true) {
 			Thread.sleep(250)
 			val newImg = getImg
-			MotionDetection.img.icon = Swing.Icon(newImg)
+			val changedPixels = diff(last, newImg, 100)()
+			
+			val imgBuff = new BufferedImage(newImg.getWidth, newImg.getHeight, BufferedImage.TYPE_INT_RGB)
+			imgBuff.setData(newImg.getData)
+			
+			for ((i, j, _) <- changedPixels) {
+				imgBuff.setRGB(i, j, Color.RED.getRGB)
+			}
+			
+			MotionDetection.img.icon = Swing.Icon(imgBuff)
 			
 			MotionDetection.panel.repaint
-			println(diff(last, newImg, 100)().length)
+			val perChange = ((changedPixels.length*1.0) / (newImg.getHeight * newImg.getWidth)) * 1000
+			if ( perChange >= 1.5) {
+				ImageIO.write(newImg, "jpg", new File(LocalTime.now.toSecondOfDay.toString+".jpg"))
+			}
+			println(perChange)
+			
 			//println(diff2(imgs._2, last._2))
 			last = newImg			
 		}
