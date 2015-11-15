@@ -30,8 +30,20 @@ def distance(c1: Color, c2: Color): Double = {
 }
 
 def getImg: BufferedImage = {
-	val url = new URL(imgURL)
-	val img = ImageIO.read(url)
+	var error = true;
+	var img: BufferedImage = null
+	do {
+		try {
+			val url = new URL(imgURL)
+			img = ImageIO.read(url)
+			error = false;
+		} catch {
+			case e: Exception => {
+				println(e.getStackTrace())
+				error = true;
+			}
+		}
+	} while (error)
 	img
 }
 
@@ -92,7 +104,6 @@ new Thread {
 			}
 			println(perChange)
 			
-			//println(diff2(imgs._2, last._2))
 			last = newImg			
 		}
 	}
