@@ -9,6 +9,7 @@ import scala.math.{sqrt, pow}
 import scala.swing._
 import javax.swing.{Icon, ImageIcon}
 import java.awt.GridLayout
+import java.util.Date;
 import java.time._;
 
 
@@ -58,7 +59,18 @@ def diff(img1: BufferedImage, img2: BufferedImage, sensitivity: Int)
 	} yield (i, j, dist);
 
 
-
+def saveImg(img: BufferedImage): Unit = {
+	val today = LocalDate.now().toString
+	
+	val dir = new File(s"./$today")
+	if (! dir.exists) {
+		dir.mkdir
+	}
+	
+	val now = new Date().getTime().toString
+	val path = new File(s"./$today/$now.jpg")
+	ImageIO.write(img, "jpg", path)	
+}
 
 object MotionDetection extends SimpleSwingApplication {
 	
@@ -100,7 +112,8 @@ new Thread {
 			MotionDetection.panel.repaint
 			val perChange = ((changedPixels.length*1.0) / (newImg.getHeight * newImg.getWidth)) * 1000
 			if ( perChange >= 1.5) {
-				ImageIO.write(newImg, "jpg", new File(LocalTime.now.toSecondOfDay.toString+".jpg"))
+				saveImg(newImg)
+
 			}
 			println(perChange)
 			
